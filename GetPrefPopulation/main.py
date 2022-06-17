@@ -40,4 +40,4 @@ def main(output_filepath, prefCode, cityCode = '-'):
     df_output.to_csv(output_filepath, index=False)
     
 if __name__ == "__main__":
-    sys.exit(main('download/population_composition_perYear.csv', 'ALL'))
+    sys.exit(main('download/population_composition.csv', 'ALL'))
