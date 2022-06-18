@@ -4,6 +4,9 @@ import pandas as pd
 import sys
 import time
 
+# 人口ピラミッド
+# https://opendata.resas-portal.go.jp/docs/api/v1/population/composition/pyramid.html
+
 def main(output_filepath, prefCode, yearRight, yearLeft, cityCode = '-', isReturn = False):
     # prefCode: 1~47 ALLの場合は全都道府県
     # cityCode: 全市町村：-

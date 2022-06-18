@@ -3,8 +3,8 @@ import urllib.request
 import pandas as pd
 import sys
 
-# 人口構成一覧
-# https://opendata.resas-portal.go.jp/docs/api/v1/population/composition/perYear.html
+# 出生数・死亡数／転入数・転出数
+# https://opendata.resas-portal.go.jp/docs/api/v1/population/sum/estimate.html
 
 def main(output_filepath, prefCode, cityCode = '-'):
     # prefCode: 1~47 ALLの場合は全都道府県
@@ -15,16 +15,14 @@ def main(output_filepath, prefCode, cityCode = '-'):
         api_key = json.load(f)
     df_output = pd.DataFrame()
     
-    # ALL処理
+    # TranslateprefCode
     if prefCode == 'ALL':
         prefCode_list = range(1,48)
     else:
         prefCode_list = [prefCode]  
     
     for prefCodeTmp in prefCode_list:
-        print(f'prefCode={prefCodeTmp} start', end=', ')
-        url = f'https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode={cityCode}&prefCode={prefCodeTmp}'
-
+        url = f'https://opendata.resas-portal.go.jp/api/v1/population/sum/estimate?cityCode={cityCode}&prefCode={prefCodeTmp}'
         # GET DATA
         req = urllib.request.Request(url, headers=api_key)
         with urllib.request.urlopen(req) as response:
@@ -32,14 +30,14 @@ def main(output_filepath, prefCode, cityCode = '-'):
             
         # EDIT DATA
         d = json.loads(data.decode())['result']['data']
-        for i in range(len(d)):
+        for i in range(1,5):
             df_tmp = pd.DataFrame(d[i]['data'])
-            df_tmp['population_type'] = d[i]['label']
+            df_tmp['reason'] = d[i]['label'] #labels = ['総人口', '転入数', '転出数', '出生数', '死亡数']
             df_tmp['prefCode'] = prefCodeTmp
             df_output = pd.concat([df_output, df_tmp])
-        df_output = df_output.loc[:,['prefCode', 'population_type', 'year', 'value', 'rate']]
+        df_output = df_output.loc[:,['prefCode', 'reason', 'year', 'value']]
     
     df_output.to_csv(output_filepath, index=False)
     
 if __name__ == "__main__":
-    sys.exit(main('download/population_composition.csv', 'ALL'))
+    sys.exit(main('download/populationOutInDeathBorn.csv', 'ALL'))
